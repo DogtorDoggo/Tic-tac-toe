@@ -1,2 +1,2 @@
 # Tic-tac-toe
-An unbeatable Tic-tac-toe agent
+A simple implementation of an unbeatable minimax Tic-tac-toe agent with Java Swing.
