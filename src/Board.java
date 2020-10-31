@@ -10,13 +10,14 @@ import java.util.*;
 
 public class Board extends JPanel {
     private static Random r = new Random();
-    public static final int PREFERRED_GRID_SIZE_PIXELS = 100;
+    public static final int PREFERRED_GRID_SIZE_PIXELS = 50;
     public static final int MINIMAX_INIT_DEPTH = 6;
     private int boardSize = 3;
 
     private Cell[][] cells;
     private boolean isPlayersTurn;
     private boolean winnerFound;
+    private final int N_IN_A_ROW = 3;// 5 for Gomoku, 3 for tic-tac-toe
     private final Image[] TERRAINS = new Image[3];
 
     public Board(){
@@ -147,55 +148,111 @@ public class Board extends JPanel {
 
     private int checkWinning() {
         JLabel jlTurn = (JLabel) getComponent(0);
+        int radius = N_IN_A_ROW / 2;
         for(int i = 0; i < boardSize; i++)
             for(int j = 0; j < boardSize; j++){
-            if(i - 1 >= 0 && i + 1 < boardSize){
-                if(cells[i-1][j].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i+1][j].role == Cell.ROLE.CIRCLE){
-                    jlTurn.setText("Player wins");
-                    winnerFound = true;
-                    return -1;
+                if(i - radius >= 0 && i + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("Player wins");
+                        winnerFound = true;
+                        return -1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("AI wins");
+                        winnerFound = true;
+                        return 1;
+                    }
                 }
-                if(cells[i-1][j].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i+1][j].role == Cell.ROLE.CROSS){
-                    jlTurn.setText("AI wins");
-                    winnerFound = true;
-                    return 1;
+
+                if(j - radius >= 0 && j + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i][j + offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("Player wins");
+                        winnerFound = true;
+                        return -1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i][j + offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("AI wins");
+                        winnerFound = true;
+                        return 1;
+                    }
+                }
+
+                if(i - radius >= 0 && i + radius < boardSize && j - radius >= 0 && j + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j + offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("Player wins");
+                        winnerFound = true;
+                        return -1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j + offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("AI wins");
+                        winnerFound = true;
+                        return 1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j - offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("Player wins");
+                        winnerFound = true;
+                        return -1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j - offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        jlTurn.setText("AI wins");
+                        winnerFound = true;
+                        return 1;
+                    }
                 }
             }
-            if(j - 1 >= 0 && j + 1 < boardSize){
-                if(cells[i][j-1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i][j+1].role == Cell.ROLE.CIRCLE){
-                    jlTurn.setText("Player wins");
-                    winnerFound = true;
-                    return -1;
-                }
-                if(cells[i][j-1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i][j+1].role == Cell.ROLE.CROSS){
-                    jlTurn.setText("AI wins");
-                    winnerFound = true;
-                    return 1;
-                }
-            }
-            if(i - 1 >= 0 && i + 1 < boardSize && j - 1 >= 0 && j + 1 < boardSize){
-                if(cells[i-1][j-1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i+1][j+1].role == Cell.ROLE.CIRCLE){
-                    jlTurn.setText("Player wins");
-                    winnerFound = true;
-                    return -1;
-                }
-                if(cells[i-1][j+1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i+1][j-1].role == Cell.ROLE.CIRCLE){
-                    jlTurn.setText("Player wins");
-                    winnerFound = true;
-                    return -1;
-                }
-                if(cells[i-1][j-1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i+1][j+1].role == Cell.ROLE.CROSS){
-                    jlTurn.setText("AI wins");
-                    winnerFound = true;
-                    return 1;
-                }
-                if(cells[i-1][j+1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i+1][j-1].role == Cell.ROLE.CROSS){
-                    jlTurn.setText("AI wins");
-                    winnerFound = true;
-                    return 1;
-                }
-            }
-        }
 
         for(int i = 0; i < boardSize; i++)
             for(int j = 0; j < boardSize; j++)
@@ -219,29 +276,93 @@ public class Board extends JPanel {
 
     // return 1 for AI win, -1 for player win, 0 for draw or undeterministic state
     private int terminalState(Cell[][] cells){
+        int radius = N_IN_A_ROW / 2;
         for(int i = 0; i < boardSize; i++)
-            for(int j = 0; j < boardSize; j++) {
-                if (i - 1 >= 0 && i + 1 < boardSize) {
-                    if (cells[i - 1][j].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i + 1][j].role == Cell.ROLE.CIRCLE)
+            for(int j = 0; j < boardSize; j++){
+                if(i - radius >= 0 && i + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return -1;
-                    if (cells[i - 1][j].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i + 1][j].role == Cell.ROLE.CROSS)
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return 1;
+                    }
                 }
-                if (j - 1 >= 0 && j + 1 < boardSize) {
-                    if (cells[i][j - 1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i][j + 1].role == Cell.ROLE.CIRCLE)
+
+                if(j - radius >= 0 && j + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i][j + offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return -1;
-                    if (cells[i][j - 1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i][j + 1].role == Cell.ROLE.CROSS)
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i][j + offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return 1;
+                    }
                 }
-                if (i - 1 >= 0 && i + 1 < boardSize && j - 1 >= 0 && j + 1 < boardSize) {
-                    if (cells[i - 1][j - 1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i + 1][j + 1].role == Cell.ROLE.CIRCLE)
+
+                if(i - radius >= 0 && i + radius < boardSize && j - radius >= 0 && j + radius < boardSize){
+                    boolean winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j + offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return -1;
-                    if (cells[i - 1][j + 1].role == Cell.ROLE.CIRCLE && cells[i][j].role == Cell.ROLE.CIRCLE && cells[i + 1][j - 1].role == Cell.ROLE.CIRCLE)
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j + offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
+                        return 1;
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j - offset].role != Cell.ROLE.CIRCLE) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return -1;
-                    if (cells[i - 1][j - 1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i + 1][j + 1].role == Cell.ROLE.CROSS)
+                    }
+
+                    winnerFlag = true;
+                    for(int offset = -radius; offset <= radius; offset++)
+                        if(cells[i + offset][j - offset].role != Cell.ROLE.CROSS) {
+                            winnerFlag = false;
+                            break;
+                        }
+                    if(winnerFlag){
                         return 1;
-                    if (cells[i - 1][j + 1].role == Cell.ROLE.CROSS && cells[i][j].role == Cell.ROLE.CROSS && cells[i + 1][j - 1].role == Cell.ROLE.CROSS)
-                        return 1;
+                    }
                 }
             }
         return 0;
